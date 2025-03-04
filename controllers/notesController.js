@@ -24,11 +24,32 @@ export const createNote = async(req, res) => {
     }
 }
 
-//Get all notes for authenticated user
+
+// Get all notes for authenticated user with pagination
 export const getNotes = async (req, res) => {
     try {
-        const notes = await Note.find({ userId: req.user._id }).sort({ createdAt: -1 });
-        res.status(200).json(notes);
+        // Get pagination parameters from the query or use defaults
+        const limit = parseInt(req.query.limit) || 10; // Default limit is 10
+        const page = parseInt(req.query.page) || 1; // Default page is 1
+
+        // Calculate the number of notes to skip
+        const skip = (page - 1) * limit;
+
+        // Fetch notes for the authenticated user with pagination
+        const notes = await Note.find({ userId: req.user._id })
+            .sort({ createdAt: -1 })
+            .skip(skip) // Skip the previous pages
+            .limit(limit); // Limit the number of notes returned
+
+        // Count total notes for the authenticated user
+        const totalNotes = await Note.countDocuments({ userId: req.user._id });
+
+        res.status(200).json({
+            notes,
+            totalNotes,
+            totalPages: Math.ceil(totalNotes / limit), // Total number of pages
+            currentPage: page,
+        });
     } catch (error) {
         console.error("Error fetching notes:", error);
         res.status(500).json({ error: "Error fetching notes" });
@@ -125,29 +146,54 @@ export const deleteNote = async (req, res) => {
 };
 
 
-//Search notes (by title or content)
+// Search notes (by title or content) with pagination
 export const searchNotes = async (req, res) => {
     try {
-
         const query = req.query.q;
         if (!query) {
             return res.status(400).json({ error: "Search query is required!" });
         }
 
+        // Get pagination parameters from the query or use defaults
+        const limit = parseInt(req.query.limit) || 10; // Default limit is 10
+        const page = parseInt(req.query.page) || 1; // Default page is 1
+
+        // Calculate the number of notes to skip
+        const skip = (page - 1) * limit;
+
+        // Fetch matching notes for the authenticated user with pagination
         const notes = await Note.find({
             userId: req.user._id,
             $or: [
                 { title: { $regex: query, $options: "i" } },
                 { content: { $regex: query, $options: "i" } }
             ]
-        }).sort({ createdAt: -1 });
+        })
+        .sort({ createdAt: -1 })
+        .skip(skip) // Skip the previous pages
+        .limit(limit); // Limit the number of notes returned
 
-        res.status(200).json(notes);
+        // Count total matching notes for the authenticated user
+        const totalNotes = await Note.countDocuments({
+            userId: req.user._id,
+            $or: [
+                { title: { $regex: query, $options: "i" } },
+                { content: { $regex: query, $options: "i" } }
+            ]
+        });
+
+        res.status(200).json({
+            notes,
+            totalNotes,
+            totalPages: Math.ceil(totalNotes / limit), // Total number of pages
+            currentPage: page,
+        });
     } catch (error) {
         console.error("Error searching notes:", error);
         res.status(500).json({ error: "Error searching notes" });
     }
 };
+
 
 
 
