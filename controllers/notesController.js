@@ -45,8 +45,8 @@ export const getNotes = async (req, res) => {
         const totalNotes = await Note.countDocuments({ userId: req.user._id });
 
         res.status(200).json({
-            notes,
-            totalNotes,
+            results: notes,
+            totalNotes: totalNotes,
             totalPages: Math.ceil(totalNotes / limit), // Total number of pages
             currentPage: page,
         });
@@ -183,8 +183,8 @@ export const searchNotes = async (req, res) => {
         });
 
         res.status(200).json({
-            notes,
-            totalNotes,
+            results: notes,
+            totalNotes: totalNotes,
             totalPages: Math.ceil(totalNotes / limit), // Total number of pages
             currentPage: page,
         });
