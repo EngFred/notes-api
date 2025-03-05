@@ -5,7 +5,7 @@ import Note from "../models/note.js";
 export const createNote = async(req, res) => {
     try {
         const authenticatedUserId = req.user._id;
-        const { title, content, color } = req.body;
+        const { title, content, color, tags } = req.body;
 
         if( !content ) {
             return res.status(400).json({ error: "Missing note content!"});
@@ -16,7 +16,24 @@ export const createNote = async(req, res) => {
             return res.status(400).json({ error: "Invalid color format. Use hex format (#ffffff)." });
         }
 
-        const note = await Note.create({ title, content, color, userId: authenticatedUserId })
+        if (title && title.length > 100) {
+            return res.status(400).json({ error: "Title is too long (max 100 characters)." });
+        }
+
+        if (tags && !Array.isArray(tags)) {
+            return res.status(400).json({ error: "Tags must be an array of strings." });
+        }
+        
+
+        const noteData = {
+            title,
+            content,
+            color, 
+            userId: authenticatedUserId,
+            tags,
+          };
+
+        const note = await Note.create(noteData)
         res.status(201).json(note);
     } catch (error) {
         console.error("Error creating note:", error);
@@ -80,7 +97,8 @@ export const getNoteById = async (req, res) => {
 //Update a note by ID
 export const updateNote = async (req, res) => {
     try {
-        const { title, content, color } = req.body;
+    
+        const { title, content, color, tags, isPinned } = req.body;
 
          // Validate the ID format
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
@@ -96,6 +114,14 @@ export const updateNote = async (req, res) => {
             return res.status(400).json({ error: "Invalid color format. Use hex format (#ffffff)." });
         }
 
+        if (title && title.length > 100) {
+            return res.status(400).json({ error: "Title is too long (max 100 characters)." });
+        }
+
+        if (tags && !Array.isArray(tags)) {
+            return res.status(400).json({ error: "Tags must be an array of strings." });
+        }
+
         // Fetch existing note
         const existingNote = await Note.findOne({ _id: req.params.id, userId: req.user._id });
 
@@ -109,7 +135,9 @@ export const updateNote = async (req, res) => {
             { 
                 title: title ?? existingNote.title, 
                 content, 
-                color: color ?? existingNote.color 
+                color: color ?? existingNote.color,
+                tags: tags ?? existingNote.tags,
+                isPinned: isPinned ?? existingNote.isPinned
             },
             { new: true, runValidators: true }
         );
