@@ -12,9 +12,9 @@ export const createNote = async(req, res) => {
         }
 
         // Validate color format (hex color code)
-        if (color && !/^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})$/.test(color)) {
-            return res.status(400).json({ error: "Invalid color format. Use hex format (#ffffff)." });
-        }
+        // if (color && !/^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})$/.test(color)) {
+        //     return res.status(400).json({ error: "Invalid color format. Use hex format (#ffffff)." });
+        // }
 
         if (title && title.length > 100) {
             return res.status(400).json({ error: "Title is too long (max 100 characters)." });
@@ -110,9 +110,9 @@ export const updateNote = async (req, res) => {
         }
 
         // Validate color format (hex color code)
-        if (color && !/^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})$/.test(color)) {
-            return res.status(400).json({ error: "Invalid color format. Use hex format (#ffffff)." });
-        }
+        // if (color && !/^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})$/.test(color)) {
+        //     return res.status(400).json({ error: "Invalid color format. Use hex format (#ffffff)." });
+        // }
 
         if (title && title.length > 100) {
             return res.status(400).json({ error: "Title is too long (max 100 characters)." });
