@@ -50,6 +50,10 @@
         <li><code>PUT /user/update</code> → Update user profile (Requires Authentication)</li>
       <li><code>DELETE /user/delete</code> → Delete user profile with all their notes information (Requires Authentication)</li>
     </ul>
+
+<h2>📱 Notes App (Android)</h2>
+<p>This API is consumed by a <strong>native Android application</strong> built using <strong>Java</strong>. You can check out the Android Notes App here:</p>
+<p><a href="https://github.com/EngFred/MyNotes-Java">📌 MyNotes-Java (GitHub Repository)</a></p>
     
   <h2>🤝 Contributing</h2>
     <p>Contributions are welcome! Feel free to <strong>fork</strong> the repository and submit a pull request.</p>
